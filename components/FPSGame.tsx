@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Octree } from "three/examples/jsm/math/Octree";
 import { OctreeHelper } from "three/examples/jsm/helpers/OctreeHelper";
 import { Capsule } from "three/examples/jsm/math/Capsule";
@@ -380,36 +380,259 @@ const FPSGame = () => {
     }
 
     // Load 3D model
-    const loader = new GLTFLoader();
-    loader.load("/models/gltf/collision-world.glb", (gltf) => {
-      scene.add(gltf.scene);
+    // const loader = new GLTFLoader();
+    // loader.load("/models/gltf/collision-world.glb", (gltf) => {
+    //   scene.add(gltf.scene);
 
-      worldOctree.fromGraphNode(gltf.scene);
+    //   worldOctree.fromGraphNode(gltf.scene);
 
-      gltf.scene.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          const mesh = child as THREE.Mesh;
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
+    //   gltf.scene.traverse((child) => {
+    //     if ((child as THREE.Mesh).isMesh) {
+    //       const mesh = child as THREE.Mesh;
+    //       mesh.castShadow = true;
+    //       mesh.receiveShadow = true;
 
-          if (
-            mesh.material instanceof THREE.MeshStandardMaterial &&
-            mesh.material.map
-          ) {
-            mesh.material.map.anisotropy = 4;
-          }
-        }
-      });
+    //       if (
+    //         mesh.material instanceof THREE.MeshStandardMaterial &&
+    //         mesh.material.map
+    //       ) {
+    //         mesh.material.map.anisotropy = 4;
+    //       }
+    //     }
+    //   });
 
-      const helper = new OctreeHelper(worldOctree);
-      helper.visible = false;
-      scene.add(helper);
+    //   const helper = new OctreeHelper(worldOctree);
+    //   helper.visible = false;
+    //   scene.add(helper);
 
-      const gui = new GUI({ width: 200 });
-      gui.add({ debug: false }, "debug").onChange(function (value) {
-        helper.visible = value;
-      });
+    //   const gui = new GUI({ width: 200 });
+    //   gui.add({ debug: false }, "debug").onChange(function (value) {
+    //     helper.visible = value;
+    //   });
+    // });
+
+    // Replace the GLTF loader part with this gallery creation code
+    // Around line 385 in the original code, where the GLTF loader was
+
+    // Instead of loading a model, we'll create our gallery
+    // Comment out or remove the GLTF loader code
+    /*
+const loader = new GLTFLoader();
+loader.load('/models/gltf/collision-world.glb', (gltf) => {
+  scene.add(gltf.scene);
+  ...
+});
+*/
+
+    // Create materials
+    const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const floorMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+    const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+
+    // Room dimensions
+    const roomWidth = 20;
+    const roomDepth = 20;
+    const roomHeight = 5;
+    const wallThickness = 0.2;
+
+    // Create floor
+    const floor = new THREE.Mesh(
+      new THREE.BoxGeometry(roomWidth, wallThickness, roomDepth),
+      floorMaterial
+    );
+    floor.position.set(0, -wallThickness / 2, 0);
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    // Create ceiling
+    const ceiling = new THREE.Mesh(
+      new THREE.BoxGeometry(roomWidth, wallThickness, roomDepth),
+      ceilingMaterial
+    );
+    ceiling.position.set(0, roomHeight + wallThickness / 2, 0);
+    ceiling.receiveShadow = true;
+    scene.add(ceiling);
+
+    // Create walls
+    // Wall 1 - Front
+    const wall1 = new THREE.Mesh(
+      new THREE.BoxGeometry(roomWidth, roomHeight, wallThickness),
+      wallMaterial
+    );
+    wall1.position.set(0, roomHeight / 2, roomDepth / 2);
+    wall1.receiveShadow = true;
+    wall1.castShadow = true;
+    scene.add(wall1);
+
+    // Wall 2 - Back
+    const wall2 = new THREE.Mesh(
+      new THREE.BoxGeometry(roomWidth, roomHeight, wallThickness),
+      wallMaterial
+    );
+    wall2.position.set(0, roomHeight / 2, -roomDepth / 2);
+    wall2.receiveShadow = true;
+    wall2.castShadow = true;
+    scene.add(wall2);
+
+    // Wall 3 - Left
+    const wall3 = new THREE.Mesh(
+      new THREE.BoxGeometry(wallThickness, roomHeight, roomDepth),
+      wallMaterial
+    );
+    wall3.position.set(-roomWidth / 2, roomHeight / 2, 0);
+    wall3.receiveShadow = true;
+    wall3.castShadow = true;
+    scene.add(wall3);
+
+    // Wall 4 - Right
+    const wall4 = new THREE.Mesh(
+      new THREE.BoxGeometry(wallThickness, roomHeight, roomDepth),
+      wallMaterial
+    );
+    wall4.position.set(roomWidth / 2, roomHeight / 2, 0);
+    wall4.receiveShadow = true;
+    wall4.castShadow = true;
+    scene.add(wall4);
+
+    // Create second floor balcony
+    const balconyHeight = roomHeight / 2;
+    const balconyWidth = roomWidth / 2;
+    const balconyDepth = roomDepth / 3;
+
+    const balcony = new THREE.Mesh(
+      new THREE.BoxGeometry(balconyWidth, wallThickness, balconyDepth),
+      floorMaterial
+    );
+    balcony.position.set(roomWidth / 4, balconyHeight, -roomDepth / 4);
+    balcony.receiveShadow = true;
+    balcony.castShadow = true;
+    scene.add(balcony);
+
+    // Create railings for balcony
+    const railingHeight = 1;
+    const railingMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
+
+    // Front railing
+    const frontRailing = new THREE.Mesh(
+      new THREE.BoxGeometry(balconyWidth, railingHeight, wallThickness / 2),
+      railingMaterial
+    );
+    frontRailing.position.set(
+      roomWidth / 4,
+      balconyHeight + railingHeight / 2,
+      -roomDepth / 4 + balconyDepth / 2
+    );
+    frontRailing.receiveShadow = true;
+    frontRailing.castShadow = true;
+    scene.add(frontRailing);
+
+    // Side railing
+    const sideRailing = new THREE.Mesh(
+      new THREE.BoxGeometry(wallThickness / 2, railingHeight, balconyDepth),
+      railingMaterial
+    );
+    sideRailing.position.set(
+      0,
+      balconyHeight + railingHeight / 2,
+      -roomDepth / 4
+    );
+    sideRailing.receiveShadow = true;
+    sideRailing.castShadow = true;
+    scene.add(sideRailing);
+
+    // Create staircase
+    const stairCount = 10;
+    const stairWidth = 3;
+    const stairDepth = 0.8;
+    const stairHeight = balconyHeight / stairCount;
+    const stairs = [];
+
+    for (let i = 0; i < stairCount; i++) {
+      const stair = new THREE.Mesh(
+        new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth),
+        floorMaterial
+      );
+
+      // Position each stair
+      stair.position.set(
+        0,
+        stairHeight / 2 + i * stairHeight,
+        -roomDepth / 4 + balconyDepth / 2 + stairDepth / 2 + i * stairDepth
+      );
+
+      stair.receiveShadow = true;
+      stair.castShadow = true;
+      scene.add(stair);
+      stairs.push(stair);
+    }
+
+    // Add all objects to octree for collision
+    const galleryGroup = new THREE.Group();
+    galleryGroup.add(
+      floor,
+      ceiling,
+      wall1,
+      wall2,
+      wall3,
+      wall4,
+      balcony,
+      frontRailing,
+      sideRailing
+    );
+    stairs.forEach((stair) => galleryGroup.add(stair));
+
+    // Add to scene and octree
+    scene.add(galleryGroup);
+    worldOctree.fromGraphNode(galleryGroup);
+
+    // Add octree helper
+    const helper = new OctreeHelper(worldOctree);
+    helper.visible = false;
+    scene.add(helper);
+
+    // Add GUI for debug
+    const gui = new GUI({ width: 200 });
+    gui.add({ debug: false }, "debug").onChange(function (value) {
+      helper.visible = value;
     });
+
+    // Set player starting position
+    playerCollider.start.set(0, 1, roomDepth / 3);
+    playerCollider.end.set(0, 2, roomDepth / 3);
+    camera.position.copy(playerCollider.end);
+
+    // Adjust lighting for gallery setting
+    scene.background = new THREE.Color(0xf0f0f0);
+    scene.fog = new THREE.Fog(0xf0f0f0, 0, 50);
+
+    // Remove existing lights
+    scene.remove(fillLight1);
+    scene.remove(directionalLight);
+
+    // Add new gallery-appropriate lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    // Add spot lights to simulate gallery lighting
+    const spotLight1 = new THREE.SpotLight(0xffffff, 1);
+    spotLight1.position.set(0, roomHeight - 0.5, 0);
+    spotLight1.angle = Math.PI / 4;
+    spotLight1.penumbra = 0.1;
+    spotLight1.decay = 2;
+    spotLight1.distance = 30;
+    spotLight1.castShadow = true;
+    spotLight1.shadow.mapSize.width = 1024;
+    spotLight1.shadow.mapSize.height = 1024;
+    scene.add(spotLight1);
+
+    // Add more spot lights as needed for better coverage
+    const spotLight2 = spotLight1.clone();
+    spotLight2.position.set(roomWidth / 3, roomHeight - 0.5, roomDepth / 3);
+    scene.add(spotLight2);
+
+    const spotLight3 = spotLight1.clone();
+    spotLight3.position.set(-roomWidth / 3, roomHeight - 0.5, -roomDepth / 3);
+    scene.add(spotLight3);
 
     // Animation loop
     function animate() {
