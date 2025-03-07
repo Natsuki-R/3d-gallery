@@ -42,3 +42,12 @@ This project is a conversion of the Three.js FPS example to a Next.js applicatio
 - TypeScript for type safety
 - Removed the "throw balls" functionality from the original example
 - Improved collision detection
+
+## Rollback
+
+```bash
+# first
+git fetch --tags
+# then
+git checkout -b rollback tags/v1.0.0
+```
